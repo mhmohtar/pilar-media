@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link href="img/logo/logo.png" rel="icon">
+
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>RuangAdmin - Dashboard</title>
+  <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ asset('css/ruang-admin.min.css') }}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&family=Roboto:wght@300&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  @yield('css')
+  <style>
+    body{
+        font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+
+<body id="page-top">
+  <div id="wrapper">
+    @include('layout.sidebar')
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+        @include('layout.topbar')
+        <!-- Container Fluid-->
+        <div class="container-fluid" id="container-wrapper">
+          @yield('breadcrumb')
+          @yield('content')
+          <!-- Modal Logout -->
+          <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelLogout"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabelLogout">Ohh No!</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>Are you sure you want to logout?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
+                  <a href="login.html" class="btn btn-primary">Logout</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!---Container Fluid-->
+      </div>
+      @include('layout.footer')
+    </div>
+  </div>
+
+  <!-- Scroll to top -->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+  @include('sweetalert::alert')
+  <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+  <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+  <script src="{{ asset('js/ruang-admin.min.js') }}"></script>
+  <script src="{{ asset('jquery/js/jquery.js') }}"></script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+
+    // $(document).ready(function(){
+    // })
+    $(document).on('click', '.add_student', function (e) {
+        e.preventDefault();
+
+        $(this).text('Sending..');
+
+        var data = {
+            'name': $('.nama_karyawan').val(),
+            'nip': $('.nip').val(),
+            'jabatan': $('.posisi').val(),
+            'departemen': $('.departemen').val(),
+            'tanggal_lahir': $('.tanggal_lahir').val(),
+            'alamat': $('.alamat').val(),
+            'telepon': $('.telepon').val(),
+            'agama': $('.agama').val(),
+        }
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/save_employee",
+            data: data,
+            dataType: "json",
+            success: function (response) {
+                // console.log(response);
+                if (response.status == 400) {
+                    $('#save_msgList').html("");
+                    $('#save_msgList').addClass('alert alert-danger');
+                    $.each(response.errors, function (key, err_value) {
+                        $('#save_msgList').append('<li>' + err_value + '</li>');
+                    });
+                    $('.add_student').text('Save');
+                } else {
+                    $('#save_msgList').html("");
+                    $('#success_message').addClass('alert alert-success');
+                    $('#success_message').text(response.message);
+                    $('#AddStudentModal').find('input').val('');
+                    $('.add_student').text('Save');
+                    //$('#AddStudentModal').modal('hide');
+                    //fetchstudent();
+                }
+            }
+        });
+    });
+
+    
+</script>
+
+
+
+  @stack('js')
+</body>
+</html>
